@@ -110,7 +110,7 @@ class StudentServiceTest {
     }
 
     @Test
-    void updateStudentShouldReturnException() { // ResponseStatusException
+    void updateStudentShouldReturnException() {
         when(studentRepositoryMock.existsById(anyInt())).thenReturn(false);
 
         assertThrows(ResponseStatusException.class, () -> {
@@ -122,7 +122,6 @@ class StudentServiceTest {
 
     @Test
     void getStudentByIdShouldReturnStudent() {
-
         when(studentRepositoryMock.findById(anyInt())).thenReturn(Optional.of(student));
 
         Student expectedStudent = student;
@@ -145,7 +144,7 @@ class StudentServiceTest {
     }
 
     @Test
-    void setGradeForStudentByIdShouldReturnStudent() { // public Student setGradeForStudentById(int studentId, String gradeAsString)
+    void setGradeForStudentByIdShouldReturnStudent() {
         int studentId = 1;
         String grade = "4.5";
 
@@ -162,7 +161,7 @@ class StudentServiceTest {
     }
 
     @Test
-    void setGradeForStudentByIdGradeFailureShouldReturnException() { // ResponseStatusException
+    void setGradeForStudentByIdGradeFailureShouldReturnException() {
         int studentId = 1;
         String grade = "Not Parseable";
 
