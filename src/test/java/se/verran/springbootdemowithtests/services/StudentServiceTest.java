@@ -61,11 +61,12 @@ class StudentServiceTest {
 
     @Test
     void getAllStudents() {
+        // TODO fixa arrayList, gör en lista som tar in studentService.allStudents() och döp till actualStudents.
         List<Student> actualStudentList = Collections.emptyList();
 
         when(studentRepositoryMock.findAll()).thenReturn(actualStudentList);
 
-        assertEquals(actualStudentList, studentService.getAllStudents(), "Unexpected answer");
+        assertEquals(studentService, studentService.getAllStudents(), "Unexpected answer");
 
         verify(studentRepositoryMock).findAll();
     }
