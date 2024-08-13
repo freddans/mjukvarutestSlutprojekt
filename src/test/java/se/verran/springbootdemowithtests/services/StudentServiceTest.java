@@ -18,44 +18,42 @@ import static org.mockito.Mockito.*;
 
 class StudentServiceTest {
     private StudentRepository studentRepositoryMock;
-    private Student studentMock;
+    private Student student;
     private StudentService studentService;
 
     @BeforeEach
     void setUp() {
         studentRepositoryMock = mock(StudentRepository.class);
-        studentMock = mock(Student.class);
+        student = new Student();
         studentService = new StudentService(studentRepositoryMock);
     }
 
     @Test
     void addStudentShouldreturnStudent() {
         String studentMail = "freddans@mail.com";
-
-        when(studentMock.getEmail()).thenReturn(studentMail);
+        student.setEmail(studentMail);
 
         when(studentRepositoryMock.existsStudentByEmail(studentMail)).thenReturn(false);
-        when(studentRepositoryMock.save(studentMock)).thenReturn(studentMock);
+        when(studentRepositoryMock.save(student)).thenReturn(student);
 
-        Student savedStudent = studentService.addStudent(studentMock);
+        Student savedStudent = studentService.addStudent(student);
 
         assertNotNull(savedStudent);
         assertEquals(studentMail, savedStudent.getEmail());
 
         verify(studentRepositoryMock).existsStudentByEmail(studentMail);
-        verify(studentRepositoryMock).save(studentMock);
+        verify(studentRepositoryMock).save(student);
     }
 
     @Test
     void addStudentShouldReturnException() {
         String studentMail = "freddans@mail.com";
-
-        when(studentMock.getEmail()).thenReturn(studentMail);
+        student.setEmail(studentMail);
 
         when(studentRepositoryMock.existsStudentByEmail(studentMail)).thenReturn(true);
 
         assertThrows(ResponseStatusException.class, () -> {
-            studentService.addStudent(studentMock);
+            studentService.addStudent(student);
         }, "Unexpected answer");
 
         verify(studentRepositoryMock).existsStudentByEmail(studentMail);
@@ -74,9 +72,8 @@ class StudentServiceTest {
 
     @Test
     void deleteStudentSuccessful() {
-
         int studentId = 1;
-        when(studentMock.getId()).thenReturn(studentId);
+        student.setId(studentId);
 
         when(studentRepositoryMock.existsById(studentId)).thenReturn(true);
 
@@ -98,18 +95,18 @@ class StudentServiceTest {
     @Test
     void updateStudentShouldReturnStudent() {
         int studentId = 1;
-        when(studentMock.getId()).thenReturn(studentId);
+        student.setId(studentId);
 
         when(studentRepositoryMock.existsById(studentId)).thenReturn(true);
-        when(studentRepositoryMock.save(studentMock)).thenReturn(studentMock);
+        when(studentRepositoryMock.save(student)).thenReturn(student);
 
-        Student expectedStudent = studentMock;
-        Student actualStudent = studentService.updateStudent(studentMock);
+        Student expectedStudent = student;
+        Student actualStudent = studentService.updateStudent(student);
 
         assertEquals(expectedStudent, actualStudent, "Expected and Actual student are not the same.");
 
         verify(studentRepositoryMock).existsById(studentId);
-        verify(studentRepositoryMock.save(studentMock));
+        verify(studentRepositoryMock).save(student);
     }
 
     @Test
@@ -117,7 +114,7 @@ class StudentServiceTest {
         when(studentRepositoryMock.existsById(anyInt())).thenReturn(false);
 
         assertThrows(ResponseStatusException.class, () -> {
-            studentService.updateStudent(studentMock);
+            studentService.updateStudent(student);
         }, "Exception was not thrown");
 
         verify(studentRepositoryMock).existsById(anyInt());
@@ -126,9 +123,9 @@ class StudentServiceTest {
     @Test
     void getStudentByIdShouldReturnStudent() {
 
-        when(studentRepositoryMock.findById(anyInt())).thenReturn(Optional.of(studentMock));
+        when(studentRepositoryMock.findById(anyInt())).thenReturn(Optional.of(student));
 
-        Student expectedStudent = studentMock;
+        Student expectedStudent = student;
         Student actualStudent = studentService.getStudentById(anyInt());
 
         assertEquals(expectedStudent, actualStudent, "Expected and Actual student are not the same.");
@@ -149,10 +146,62 @@ class StudentServiceTest {
 
     @Test
     void setGradeForStudentByIdShouldReturnStudent() { // public Student setGradeForStudentById(int studentId, String gradeAsString)
+        int studentId = 1;
+        String grade = "4.5";
+
+        when(studentRepositoryMock.findById(studentId)).thenReturn(Optional.of(student));
+        when(studentRepositoryMock.save(student)).thenReturn(student);
+
+
+        Student actualStudent = studentService.setGradeForStudentById(studentId, grade);
+
+        assertEquals(student, actualStudent, "Not same");
+
+        verify(studentRepositoryMock, times(1)).findById(studentId);
+        verify(studentRepositoryMock, times(1)).save(student);
     }
 
     @Test
-    void setGradeForStudentByIdShouldReturnException() { // ResponseStatusException
+    void setGradeForStudentByIdGradeFailureShouldReturnException() { // ResponseStatusException
+        int studentId = 1;
+        String grade = "Not Parseable";
 
+        assertThrows(ResponseStatusException.class, () -> {
+            studentService.setGradeForStudentById(studentId, grade);
+        }, "Exception not thrown");
+    }
+
+    @Test
+    void setGradeForStudentByIdWithLessThanShouldReturnException() {
+        int studentId = 1;
+        String grade = "-1";
+
+        assertThrows(ResponseStatusException.class, () -> {
+            studentService.setGradeForStudentById(studentId, grade);
+        }, "Exception where grade is less than 0 not thrown");
+    }
+
+    @Test
+    void setGradeForStudentIdWithMoreThanShouldReturnException() {
+        int studentId = 1;
+        String grade = "6";
+
+        assertThrows(ResponseStatusException.class, () -> {
+            studentService.setGradeForStudentById(studentId, grade);
+        }, "Exception where grade is more than 5 not thrown.");
+    }
+
+    @Test
+    void setGradeForStudentByIdWhereStudentNotFoundShouldReturnException() {
+        int studentId = 1;
+        String grade = "3.2";
+
+        when(studentRepositoryMock.findById(studentId)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class, () -> {
+            studentService.setGradeForStudentById(studentId, grade);
+        }, "Exception where student could not be found was not thrown.");
+
+        verify(studentRepositoryMock).findById(studentId);
     }
 }
