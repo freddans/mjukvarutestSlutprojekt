@@ -3,25 +3,21 @@ package se.verran.springbootdemowithtests.services;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
-import se.verran.springbootdemowithtests.controllers.SchoolController;
 import se.verran.springbootdemowithtests.entities.Student;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 class SchoolServiceTest {
 
     private StudentService studentServiceMock;
     private SchoolService schoolService;
-    private Student student;
 
     @BeforeEach
     void setUp() {
@@ -31,242 +27,148 @@ class SchoolServiceTest {
 
     @Test
     void numberOfStudentsPerGroupWhenDivideIntoNumberOfGroupsWhereGroupsLessThanTwoShouldReturnString() {
-
-
-//        public String numberOfStudentsPerGroupWhenDivideIntoNumberOfGroups(int numberOfGroups) {
-//            int numberOfStudents = studentService.getAllStudents().size();
-//
-//TODO        if(numberOfGroups < 2)
-//                return "There should be at least two groups";
-//
-//            if(numberOfGroups > numberOfStudents)
-//                return String.format("Not able to divide %s students into %s groups", numberOfStudents, numberOfGroups);
-//            int studentsPerGroup = numberOfStudents / numberOfGroups;
-//            if(studentsPerGroup < 2)
-//                return String.format("Not able to manage %s groups with %s students", numberOfGroups, numberOfStudents);
-//            int remainder = numberOfStudents % numberOfGroups;
-//            return String.format("%s groups could be formed with %s students per group%s",
-//                    numberOfGroups,
-//                    studentsPerGroup,
-//                    (remainder == 0 ? "" : String.format(", but that would leave %s student" + (remainder == 1 ? "" : "s") + " hanging", remainder)));
-//        }
-
         List<Student> studentList = Arrays.asList(new Student());
 
         when(studentServiceMock.getAllStudents()).thenReturn(studentList);
 
-        String expectedMessage = "There should be at least two groups";
         String actualMessage = schoolService.numberOfStudentsPerGroupWhenDivideIntoNumberOfGroups(1);
 
-        assertEquals(expectedMessage, actualMessage, "Messages are not identical");
+        assertEquals("There should be at least two groups", actualMessage, "Messages are not identical");
 
         verify(studentServiceMock).getAllStudents();
     }
 
     @Test
     void numberOfStudentsPerGroupWhenDivideIntoNumberOfGroupsWhereGroupsAreMoreThanStudentsShouldReturnString() {
-//        public String numberOfStudentsPerGroupWhenDivideIntoNumberOfGroups(int numberOfGroups) {
-//            int numberOfStudents = studentService.getAllStudents().size();
-//
-//            if(numberOfGroups < 2)
-//                return "There should be at least two groups";
-
-//TODO            if(numberOfGroups > numberOfStudents)
-//                return String.format("Not able to divide %s students into %s groups", numberOfStudents, numberOfGroups);
-
-//            int studentsPerGroup = numberOfStudents / numberOfGroups;
-//            if(studentsPerGroup < 2)
-//                return String.format("Not able to manage %s groups with %s students", numberOfGroups, numberOfStudents);
-//            int remainder = numberOfStudents % numberOfGroups;
-//            return String.format("%s groups could be formed with %s students per group%s",
-//                    numberOfGroups,
-//                    studentsPerGroup,
-//                    (remainder == 0 ? "" : String.format(", but that would leave %s student" + (remainder == 1 ? "" : "s") + " hanging", remainder)));
-//        }
         List<Student> studentList = Arrays.asList(new Student());
-
         int nrOfGroups = 2;
-        int nrOfStudents = studentList.size();
 
         when(studentServiceMock.getAllStudents()).thenReturn(studentList);
 
-        String expectedMessage = String.format("Not able to divide %s students into %s groups", nrOfStudents, nrOfGroups);
         String actualMessage = schoolService.numberOfStudentsPerGroupWhenDivideIntoNumberOfGroups(nrOfGroups);
 
-        assertEquals(expectedMessage, actualMessage, "Messages are not identical.");
+        assertEquals("Not able to divide 1 students into 2 groups", actualMessage, "Messages are not identical.");
 
         verify(studentServiceMock).getAllStudents();
     }
 
     @Test
     void numberOfStudentsPerGroupWhenDivideIntoNumberOfGroupsWhereStudentsPerGroupAreLessThanTwoShouldReturnString() {
-//        public String numberOfStudentsPerGroupWhenDivideIntoNumberOfGroups(int numberOfGroups) {
-//            int numberOfStudents = studentService.getAllStudents().size();
-//
-//            if(numberOfGroups < 2)
-//                return "There should be at least two groups";
-//
-//            if(numberOfGroups > numberOfStudents)
-//                return String.format("Not able to divide %s students into %s groups", numberOfStudents, numberOfGroups);
-//
-//            int studentsPerGroup = numberOfStudents / numberOfGroups;
-//TODO        if(studentsPerGroup < 2)
-//                return String.format("Not able to manage %s groups with %s students", numberOfGroups, numberOfStudents);
-//
-//            int remainder = numberOfStudents % numberOfGroups;
-//            return String.format("%s groups could be formed with %s students per group%s",
-//                    numberOfGroups,
-//                    studentsPerGroup,
-//                    (remainder == 0 ? "" : String.format(", but that would leave %s student" + (remainder == 1 ? "" : "s") + " hanging", remainder)));
-//        }
-
         List<Student> studentList = Arrays.asList(new Student(), new Student(), new Student());
-
         int nrOfGroups = 2;
-        int nrOfStudents = studentList.size();
 
         when(studentServiceMock.getAllStudents()).thenReturn(studentList);
 
-        String expectedMessage = String.format("Not able to manage %s groups with %s students", nrOfGroups, nrOfStudents);
         String actualMessage = schoolService.numberOfStudentsPerGroupWhenDivideIntoNumberOfGroups(nrOfGroups);
 
-        assertEquals(expectedMessage, actualMessage, "Messages are not identical");
+        assertEquals("Not able to manage 2 groups with 3 students", actualMessage, "Messages are not identical");
 
         verify(studentServiceMock).getAllStudents();
     }
 
     @Test
-    void numberOfStudentsPerGroupWhenDivideIntoNumberOfGroupsSuccessfulShouldReturnString() {
-//        public String numberOfStudentsPerGroupWhenDivideIntoNumberOfGroups(int numberOfGroups) {
-//            int numberOfStudents = studentService.getAllStudents().size();
-//
-//            if(numberOfGroups < 2)
-//                return "There should be at least two groups";
-//
-//            if(numberOfGroups > numberOfStudents)
-//                return String.format("Not able to divide %s students into %s groups", numberOfStudents, numberOfGroups);
-//
-//            int studentsPerGroup = numberOfStudents / numberOfGroups;
-//            if(studentsPerGroup < 2)
-//                return String.format("Not able to manage %s groups with %s students", numberOfGroups, numberOfStudents);
-//
-//            int remainder = numberOfStudents % numberOfGroups;
-//TODO        return String.format("%s groups could be formed with %s students per group%s",
-//                    numberOfGroups,
-//                    studentsPerGroup,
-//                    (remainder == 0 ? "" : String.format(", but that would leave %s student" + (remainder == 1 ? "" : "s") + " hanging", remainder)));
-//        }
-
+    void numberOfStudentsPerGroupWhenDivideIntoNumberOfGroupsSuccessfulWithNoRemainderShouldReturnString() {
         List<Student> studentList = Arrays.asList(new Student(), new Student(), new Student(), new Student(), new Student(), new Student());
-
         int nrOfGroups = 3;
-        int nrOfStudents = studentList.size();
-        int nrOfStudentsPerGroup = nrOfStudents / nrOfGroups;
-        int remainder = nrOfStudents % nrOfGroups;
 
         when(studentServiceMock.getAllStudents()).thenReturn(studentList);
 
-        String expectedMessage = String.format("%s groups could be formed with %s students per group%s",
-                    nrOfGroups,
-                    nrOfStudentsPerGroup,
-                    (remainder == 0 ? "" : String.format(", but that would leave %s student" + (remainder == 1 ? "" : "s") + " hanging", remainder)));
+        String actualMessage = schoolService.numberOfStudentsPerGroupWhenDivideIntoNumberOfGroups(nrOfGroups);
+
+        assertEquals("3 groups could be formed with 2 students per group", actualMessage, "Messages are not identical");
+
+        verify(studentServiceMock).getAllStudents();
+    }
+
+    @Test
+    void numberOfStudentsPerGroupWhenDivideIntoNumberOfGroupsSuccessfulWithRemainderShouldReturnString() {
+        List<Student> studentList = Arrays.asList(new Student(), new Student(), new Student(), new Student(), new Student());
+        int nrOfGroups = 2;
+
+        when(studentServiceMock.getAllStudents()).thenReturn(studentList);
 
         String actualMessage = schoolService.numberOfStudentsPerGroupWhenDivideIntoNumberOfGroups(nrOfGroups);
 
-        assertEquals(expectedMessage, actualMessage, "Messages are not identical");
+        assertEquals("2 groups could be formed with 2 students per group, but that would leave 1 student hanging", actualMessage, "Messages are not identical");
 
         verify(studentServiceMock).getAllStudents();
     }
 
     @Test
     void numberOfGroupsWhenDividedIntoGroupsOfWhereStudentsPerGroupAreLessThanTwoShouldReturnString() {
-//        public String numberOfGroupsWhenDividedIntoGroupsOf(int studentsPerGroup){
-//            int numberOfStudents = studentService.getAllStudents().size();
-//TODO        if(studentsPerGroup < 2)
-//                return "Size of group should be at least 2";
-//
-//            if(numberOfStudents < studentsPerGroup || numberOfStudents / studentsPerGroup < 2)
-//                return String.format("Not able to manage groups of %s with only %s students", studentsPerGroup, numberOfStudents);
-//            int numberOfGroups = numberOfStudents / studentsPerGroup;
-//            int remainder = numberOfStudents % studentsPerGroup;
-//            return String.format("%s students per group is possible, there will be %s groups" +
-//                            (remainder == 0 ? "":", there will be " + remainder + " student" + (remainder == 1 ? "" : "s") + " hanging"),
-//                    studentsPerGroup, numberOfGroups,
-//                    (remainder == 0 ? "":String.format(", there will be %s student" + (remainder == 1 ? "" : "s") + " hanging", remainder)));
-//        }
+        List<Student> studentList = Arrays.asList(new Student());
+
+        when(studentServiceMock.getAllStudents()).thenReturn(studentList);
+
+        String actualResult = schoolService.numberOfGroupsWhenDividedIntoGroupsOf(studentList.size());
+
+        assertEquals("Size of group should be at least 2", actualResult, "Messages was not identical");
+
+        verify(studentServiceMock).getAllStudents();
     }
 
     @Test
-    void numberOfGroupsWhenDividedIntoGroupsOfWhereNumberOfStudentsAreLessThanStudentsPerGroupShouldreturnString() {
-//        public String numberOfGroupsWhenDividedIntoGroupsOf(int studentsPerGroup){
-//            int numberOfStudents = studentService.getAllStudents().size();
-//            if(studentsPerGroup < 2)
-//                return "Size of group should be at least 2";
-//
-//TODO            if(numberOfStudents < studentsPerGroup || NOT TODO HERE numberOfStudents / studentsPerGroup < 2)
-//TODO            return String.format("Not able to manage groups of %s with only %s students", studentsPerGroup, numberOfStudents);
-//
-//            int numberOfGroups = numberOfStudents / studentsPerGroup;
-//            int remainder = numberOfStudents % studentsPerGroup;
-//            return String.format("%s students per group is possible, there will be %s groups" +
-//                            (remainder == 0 ? "":", there will be " + remainder + " student" + (remainder == 1 ? "" : "s") + " hanging"),
-//                    studentsPerGroup, numberOfGroups,
-//                    (remainder == 0 ? "":String.format(", there will be %s student" + (remainder == 1 ? "" : "s") + " hanging", remainder)));
-//        }
+    void numberOfGroupsWhenDividedIntoGroupsOfWhereNumberOfStudentsAreLessThanStudentsPerGroupShouldReturnString() {
+        List<Student> studentList = Arrays.asList(
+                new Student(), new Student(), new Student(),
+                new Student(), new Student(), new Student(),
+                new Student(), new Student(), new Student()
+        );
+        int studentsPerGroup = 5;
+
+        when(studentServiceMock.getAllStudents()).thenReturn(studentList);
+
+        String actualResult = schoolService.numberOfGroupsWhenDividedIntoGroupsOf(studentsPerGroup);
+
+        assertEquals("Not able to manage groups of 5 with only 9 students", actualResult, "Messages was not identical");
+
+        verify(studentServiceMock).getAllStudents();
     }
 
     @Test
     void numberOfGroupsWhenDividedIntoGroupsOfWhereNumberOfStudentsDividedWithStudentsPerGroupIsLessThanTwoShouldReturnString() {
-//        public String numberOfGroupsWhenDividedIntoGroupsOf(int studentsPerGroup){
-//            int numberOfStudents = studentService.getAllStudents().size();
-//            if(studentsPerGroup < 2)
-//                return "Size of group should be at least 2";
-//
-//            if(numberOfStudents < studentsPerGroup || TODO numberOfStudents / studentsPerGroup < 2)
-//TODO            return String.format("Not able to manage groups of %s with only %s students", studentsPerGroup, numberOfStudents);
-//
-//            int numberOfGroups = numberOfStudents / studentsPerGroup;
-//            int remainder = numberOfStudents % studentsPerGroup;
-//            return String.format("%s students per group is possible, there will be %s groups" +
-//                            (remainder == 0 ? "":", there will be " + remainder + " student" + (remainder == 1 ? "" : "s") + " hanging"),
-//                    studentsPerGroup, numberOfGroups,
-//                    (remainder == 0 ? "":String.format(", there will be %s student" + (remainder == 1 ? "" : "s") + " hanging", remainder)));
-//        }
+        List<Student> studentList = Arrays.asList(new Student(), new Student(), new Student());
+        int studentsPerGroup = 2;
+
+        when(studentServiceMock.getAllStudents()).thenReturn(studentList);
+
+        String actualResult = schoolService.numberOfGroupsWhenDividedIntoGroupsOf(studentsPerGroup);
+
+        assertEquals("Not able to manage groups of 2 with only 3 students", actualResult, "Messages was not identical");
+
+        verify(studentServiceMock).getAllStudents();
     }
 
     @Test
-    void numberOfGroupsWhenDividedIntoGroupsOfSuccessfulShouldReturnString() {
-//        public String numberOfGroupsWhenDividedIntoGroupsOf(int studentsPerGroup){
-//            int numberOfStudents = studentService.getAllStudents().size();
-//            if(studentsPerGroup < 2)
-//                return "Size of group should be at least 2";
-//
-//            if(numberOfStudents < studentsPerGroup || numberOfStudents / studentsPerGroup < 2)
-//                return String.format("Not able to manage groups of %s with only %s students", studentsPerGroup, numberOfStudents);
-//
-//            int numberOfGroups = numberOfStudents / studentsPerGroup;
-//            int remainder = numberOfStudents % studentsPerGroup;
-//TODO        return String.format("%s students per group is possible, there will be %s groups" +
-//                            (remainder == 0 ? "":", there will be " + remainder + " student" + (remainder == 1 ? "" : "s") + " hanging"),
-//                    studentsPerGroup, numberOfGroups,
-//                    (remainder == 0 ? "":String.format(", there will be %s student" + (remainder == 1 ? "" : "s") + " hanging", remainder)));
-//
-//        }
+    void numberOfGroupsWhenDividedIntoGroupsOfSuccessfulWithNoRemainderShouldReturnString() {
+        List<Student> studentList = Arrays.asList(new Student(), new Student(), new Student(), new Student());
+        int studentsPerGroup = 2;
+
+        when(studentServiceMock.getAllStudents()).thenReturn(studentList);
+
+        String actualResult = schoolService.numberOfGroupsWhenDividedIntoGroupsOf(studentsPerGroup);
+
+        assertEquals("2 students per group is possible, there will be 2 groups", actualResult, "Messages are not identical");
+
+        verify(studentServiceMock).getAllStudents();
+    }
+
+    @Test
+    void numberOfGroupsWhenDividedIntoGroupsOfSuccessfulWithRemainderOneShouldReturnString() {
+        List<Student> studentList = Arrays.asList(new Student(), new Student(), new Student(), new Student(), new Student());
+        int studentsPerGroup = 2;
+
+        when(studentServiceMock.getAllStudents()).thenReturn(studentList);
+
+        String actualResult = schoolService.numberOfGroupsWhenDividedIntoGroupsOf(studentsPerGroup);
+
+        assertEquals("2 students per group is possible, there will be 2 groups, there will be 1 student hanging", actualResult, "Messages are not identical");
+
+        verify(studentServiceMock).getAllStudents();
     }
 
     @Test
     void calculateAverageGradeWithEmptyListShouldReturnException() {
-//        public String calculateAverageGrade() {
-//            List<Student> studentList = studentService.getAllStudents();
-//TODO        if(studentList.isEmpty())
-//                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No students found");
-//
-//            double totalSum = 0.0;
-//            for (Student student: studentList)
-//                totalSum += student.getJavaProgrammingGrade();
-//            double average = totalSum / studentList.size();
-//            return String.format("Average grade is %.1f", average);
-//        }
         List<Student> studentList = Collections.emptyList();
 
         when(studentServiceMock.getAllStudents()).thenReturn(studentList);
@@ -281,45 +183,79 @@ class SchoolServiceTest {
         verify(studentServiceMock).getAllStudents();
     }
     @Test
-    void calculateAverageGrade2() {
-        //TODO ERROR HERE HAVE TO CONTINUE AND MAKE THIS WORK
-
-//        public String calculateAverageGrade() {
-//            List<Student> studentList = studentService.getAllStudents();
-//            if(studentList.isEmpty())
-//                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No students found");
-//            double totalSum = 0.0;
-//            for (Student student: studentList)
-//                totalSum += student.getJavaProgrammingGrade();
-//            double average = totalSum / studentList.size();
-//TODO        return String.format("Average grade is %.1f", average);
-//        }
-        List<Student> studentList = Arrays.asList(student);
-        double totalSum = 0.0;
-
-        for (Student student : studentList) {
-            totalSum += student.getJavaProgrammingGrade();
-        }
-        double average = totalSum / studentList.size();
+    void calculateAverageGradeSuccessfulShouldReturnStringFormat() {
+        List<Student> studentList = Arrays.asList(
+                new Student() {{
+                    setJavaProgrammingGrade(1.5);
+                }},
+                new Student() {{
+                    setJavaProgrammingGrade(4.0);
+                }},
+                new Student() {{
+                    setJavaProgrammingGrade(4.5);
+                }},
+                new Student() {{
+                    setJavaProgrammingGrade(5.0);
+                }},
+                new Student() {{
+                    setJavaProgrammingGrade(1.0);
+                }},
+                new Student() {{
+                    setJavaProgrammingGrade(3.0);
+                }}
+        );
 
         when(studentServiceMock.getAllStudents()).thenReturn(studentList);
 
         String result = schoolService.calculateAverageGrade();
 
-        assertEquals(String.format("Average grade is %.1f", average), result, "Expected and Actual message are not identical");
+        assertEquals("Average grade is 3,2", result, "Expected and Actual message are not identical");
+
+        verify(studentServiceMock).getAllStudents();
+    }
+
+
+
+    @Test
+    void getTopScoringStudentsShouldReturnException() {
+        List<Student> studentList = Collections.emptyList();
+
+        when(studentServiceMock.getAllStudents()).thenReturn(studentList);
+
+        ResponseStatusException response = assertThrows(ResponseStatusException.class, () -> {
+            schoolService.getTopScoringStudents();
+        }, "Exception was not thrown");
+
+        assertEquals("No students found", response.getReason(), "Exceptions was not identical");
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(), "Status Codes was not identical");
 
         verify(studentServiceMock).getAllStudents();
     }
 
     @Test
-    void calculateAverageGrade3() {
-    }
+    void getTopScoringStudentsSuccessfulShouldReturnSortedStudentList() {
+        List<Student> studentList = Arrays.asList(
+                new Student("Anders", "Andersson", LocalDate.of(1998, 2, 15), "anders@email.com") {{
+                    setJavaProgrammingGrade(2.5);
+                }},
+                new Student("Bertil", "Bertilsson", LocalDate.of(1956, 11, 5), "bertil@bertilssons.se") {{
+                    setJavaProgrammingGrade(5.0);
+                }},
+                new Student("Carl", "Carlsson", LocalDate.of(2001, 3, 18), "carl@gmail.com") {{
+                    setJavaProgrammingGrade(1.5);
+                }},
+                new Student("Mikaela", "Mikaelsdottir", LocalDate.of(1972, 6, 22), "mikaelas@foretag.se") {{
+                    setJavaProgrammingGrade(2.0);
+                }}
+        );
 
-    @Test
-    void calculateAverageGrade4() {
-    }
+        when(studentServiceMock.getAllStudents()).thenReturn(studentList);
 
-    @Test
-    void getTopScoringStudents() {
+        List<Student> actualList = schoolService.getTopScoringStudents();
+
+        assertEquals(1, actualList.size(), "More or less than 20% of the students were added into the list");
+        assertEquals("Bertil", actualList.get(0).getFirstName(), "Name was not identical");
+
+        verify(studentServiceMock).getAllStudents();
     }
 }
