@@ -9,6 +9,7 @@ import se.verran.springbootdemowithtests.controllers.StudentController;
 import se.verran.springbootdemowithtests.entities.Student;
 import se.verran.springbootdemowithtests.repositories.StudentRepository;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -52,23 +53,31 @@ class StudentServiceTest {
 
         when(studentRepositoryMock.existsStudentByEmail(studentMail)).thenReturn(true);
 
-        assertThrows(ResponseStatusException.class, () -> {
+        ResponseStatusException response = assertThrows(ResponseStatusException.class, () -> {
             studentService.addStudent(student);
         }, "Unexpected answer");
+
+        assertEquals("Email " + student.getEmail() + " already exists", response.getReason(), "Expected and Actual was not identical");
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode(), "Status Codes are not identical");
 
         verify(studentRepositoryMock).existsStudentByEmail(studentMail);
     }
 
     @Test
     void getAllStudents() {
-        // TODO fixa arrayList, gör en lista som tar in studentService.allStudents() och döp till actualStudents.
-        List<Student> actualStudentList = Collections.emptyList();
+        List<Student> studentList = Arrays.asList(student);
+        int expectedAmountOfStudents = studentList.size();
 
-        when(studentRepositoryMock.findAll()).thenReturn(actualStudentList);
+        when(studentRepositoryMock.findAll()).thenReturn(studentList);
 
-        assertEquals(studentService, studentService.getAllStudents(), "Unexpected answer");
+        int actualAmountOfStudents = studentService.getAllStudents().size();
+        List<Student> actualStudentList = studentService.getAllStudents();
 
-        verify(studentRepositoryMock).findAll();
+
+        assertEquals(expectedAmountOfStudents, actualAmountOfStudents, "expected amount of students are not identical to actual amount of students");
+        assertEquals(studentList, actualStudentList, "Unexpected answer");
+
+        verify(studentRepositoryMock, times(2)).findAll();
     }
 
     @Test
@@ -86,11 +95,17 @@ class StudentServiceTest {
 
     @Test
     void deleteStudentShouldReturnException() {
-        when(studentRepositoryMock.existsById(anyInt())).thenReturn(false);
+        int studentId = 1;
+        when(studentRepositoryMock.existsById(studentId)).thenReturn(false);
 
-        assertThrows(ResponseStatusException.class, () -> {
-            studentService.deleteStudent(anyInt());
+        ResponseStatusException response = assertThrows(ResponseStatusException.class, () -> {
+            studentService.deleteStudent(studentId);
         }, "Exception was not thrown");
+
+        assertEquals("Could not find and delete student by id " + studentId, response.getReason(), "Exceptions was not identical");
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(), "Status code was not identical");
+
+        verify(studentRepositoryMock).existsById(studentId);
     }
 
     @Test
@@ -112,13 +127,17 @@ class StudentServiceTest {
 
     @Test
     void updateStudentShouldReturnException() {
-        when(studentRepositoryMock.existsById(anyInt())).thenReturn(false);
+        int studentId = student.getId();
+        when(studentRepositoryMock.existsById(studentId)).thenReturn(false);
 
-        assertThrows(ResponseStatusException.class, () -> {
+        ResponseStatusException response = assertThrows(ResponseStatusException.class, () -> {
             studentService.updateStudent(student);
         }, "Exception was not thrown");
 
-        verify(studentRepositoryMock).existsById(anyInt());
+        assertEquals("Could not find and update student by id " + student.getId(), response.getReason(), "Exceptions was not identical");
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(), "Status Codes not identical");
+
+        verify(studentRepositoryMock).existsById(studentId);
     }
 
     @Test
@@ -135,13 +154,17 @@ class StudentServiceTest {
 
     @Test
     void getStudentByIdShouldReturnException() {
-        when(studentRepositoryMock.findById(anyInt())).thenReturn(Optional.empty());
+        int studentId = student.getId();
+        when(studentRepositoryMock.findById(studentId)).thenReturn(Optional.empty());
 
-        assertThrows(ResponseStatusException.class, () -> {
-            studentService.getStudentById(anyInt());
+        ResponseStatusException response = assertThrows(ResponseStatusException.class, () -> {
+            studentService.getStudentById(studentId);
         }, "Exception was not thrown.");
 
-        verify(studentRepositoryMock).findById(anyInt());
+        assertEquals("Could not find student by id " + studentId, response.getReason(), "Exceptions was not identical");
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(), "Status Codes not identical");
+
+        verify(studentRepositoryMock).findById(studentId);
     }
 
     @Test
@@ -166,9 +189,12 @@ class StudentServiceTest {
         int studentId = 1;
         String grade = "Not Parseable";
 
-        assertThrows(ResponseStatusException.class, () -> {
+        ResponseStatusException response = assertThrows(ResponseStatusException.class, () -> {
             studentService.setGradeForStudentById(studentId, grade);
         }, "Exception not thrown");
+
+        assertEquals("Valid grades are 0.0 - 5.0", response.getReason(), "Exceptions was not identical");
+        assertEquals(HttpStatus.NOT_ACCEPTABLE, response.getStatusCode(), "Status Codes was not identical");
     }
 
     @Test
@@ -176,9 +202,12 @@ class StudentServiceTest {
         int studentId = 1;
         String grade = "-1";
 
-        assertThrows(ResponseStatusException.class, () -> {
+        ResponseStatusException response = assertThrows(ResponseStatusException.class, () -> {
             studentService.setGradeForStudentById(studentId, grade);
         }, "Exception where grade is less than 0 not thrown");
+
+        assertEquals("Valid grades are 0.0 - 5.0", response.getReason(), "Exceptions was not identical");
+        assertEquals(HttpStatus.NOT_ACCEPTABLE, response.getStatusCode(), "Status Codes was not identical");
     }
 
     @Test
@@ -186,9 +215,12 @@ class StudentServiceTest {
         int studentId = 1;
         String grade = "6";
 
-        assertThrows(ResponseStatusException.class, () -> {
+        ResponseStatusException response = assertThrows(ResponseStatusException.class, () -> {
             studentService.setGradeForStudentById(studentId, grade);
         }, "Exception where grade is more than 5 not thrown.");
+
+        assertEquals("Valid grades are 0.0 - 5.0", response.getReason(), "Exceptions was not identical");
+        assertEquals(HttpStatus.NOT_ACCEPTABLE, response.getStatusCode(), "Status Codes was not identical");
     }
 
     @Test
@@ -198,9 +230,12 @@ class StudentServiceTest {
 
         when(studentRepositoryMock.findById(studentId)).thenReturn(Optional.empty());
 
-        assertThrows(ResponseStatusException.class, () -> {
+        ResponseStatusException response = assertThrows(ResponseStatusException.class, () -> {
             studentService.setGradeForStudentById(studentId, grade);
         }, "Exception where student could not be found was not thrown.");
+
+        assertEquals("Could not find and update grades for student by id " + studentId, response.getReason(), "Exceptions was not identical");
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(), "Status Codes was not identical");
 
         verify(studentRepositoryMock).findById(studentId);
     }

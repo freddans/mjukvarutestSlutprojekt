@@ -2,11 +2,14 @@ package se.verran.springbootdemowithtests.services;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 import se.verran.springbootdemowithtests.controllers.SchoolController;
 import se.verran.springbootdemowithtests.entities.Student;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,7 +27,6 @@ class SchoolServiceTest {
     void setUp() {
         studentServiceMock = mock(StudentService.class);
         schoolService = new SchoolService(studentServiceMock);
-        student = new Student();
     }
 
     @Test
@@ -49,8 +51,7 @@ class SchoolServiceTest {
 //                    (remainder == 0 ? "" : String.format(", but that would leave %s student" + (remainder == 1 ? "" : "s") + " hanging", remainder)));
 //        }
 
-        List<Student> studentList = new ArrayList<>();
-        studentList.add(student);
+        List<Student> studentList = Arrays.asList(new Student());
 
         when(studentServiceMock.getAllStudents()).thenReturn(studentList);
 
@@ -82,8 +83,7 @@ class SchoolServiceTest {
 //                    studentsPerGroup,
 //                    (remainder == 0 ? "" : String.format(", but that would leave %s student" + (remainder == 1 ? "" : "s") + " hanging", remainder)));
 //        }
-        List<Student> studentList = new ArrayList<>();
-        studentList.add(student);
+        List<Student> studentList = Arrays.asList(new Student());
 
         int nrOfGroups = 2;
         int nrOfStudents = studentList.size();
@@ -119,13 +119,8 @@ class SchoolServiceTest {
 //                    studentsPerGroup,
 //                    (remainder == 0 ? "" : String.format(", but that would leave %s student" + (remainder == 1 ? "" : "s") + " hanging", remainder)));
 //        }
-        Student student2 = new Student();
-        Student student3 = new Student();
 
-        List<Student> studentList = new ArrayList<>();
-        studentList.add(student);
-        studentList.add(student2);
-        studentList.add(student3);
+        List<Student> studentList = Arrays.asList(new Student(), new Student(), new Student());
 
         int nrOfGroups = 2;
         int nrOfStudents = studentList.size();
@@ -162,18 +157,7 @@ class SchoolServiceTest {
 //                    (remainder == 0 ? "" : String.format(", but that would leave %s student" + (remainder == 1 ? "" : "s") + " hanging", remainder)));
 //        }
 
-        Student student2 = new Student();
-        Student student3 = new Student();
-        Student student4 = new Student();
-        Student student5 = new Student();
-        Student student6 = new Student();
-        List<Student> studentList = new ArrayList<>();
-        studentList.add(student);
-        studentList.add(student2);
-        studentList.add(student3);
-        studentList.add(student4);
-        studentList.add(student5);
-        studentList.add(student6);
+        List<Student> studentList = Arrays.asList(new Student(), new Student(), new Student(), new Student(), new Student(), new Student());
 
         int nrOfGroups = 3;
         int nrOfStudents = studentList.size();
@@ -271,7 +255,68 @@ class SchoolServiceTest {
     }
 
     @Test
-    void calculateAverageGrade() {
+    void calculateAverageGradeWithEmptyListShouldReturnException() {
+//        public String calculateAverageGrade() {
+//            List<Student> studentList = studentService.getAllStudents();
+//TODO        if(studentList.isEmpty())
+//                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No students found");
+//
+//            double totalSum = 0.0;
+//            for (Student student: studentList)
+//                totalSum += student.getJavaProgrammingGrade();
+//            double average = totalSum / studentList.size();
+//            return String.format("Average grade is %.1f", average);
+//        }
+        List<Student> studentList = Collections.emptyList();
+
+        when(studentServiceMock.getAllStudents()).thenReturn(studentList);
+
+        ResponseStatusException response = assertThrows(ResponseStatusException.class, () -> {
+            schoolService.calculateAverageGrade();
+        }, "Exception was not thrown");
+
+        assertEquals("No students found", response.getReason(), "Exceptions was not identical");
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(), "Status Codes was not identical");
+
+        verify(studentServiceMock).getAllStudents();
+    }
+    @Test
+    void calculateAverageGrade2() {
+        //TODO ERROR HERE HAVE TO CONTINUE AND MAKE THIS WORK
+
+//        public String calculateAverageGrade() {
+//            List<Student> studentList = studentService.getAllStudents();
+//            if(studentList.isEmpty())
+//                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No students found");
+//            double totalSum = 0.0;
+//            for (Student student: studentList)
+//                totalSum += student.getJavaProgrammingGrade();
+//            double average = totalSum / studentList.size();
+//TODO        return String.format("Average grade is %.1f", average);
+//        }
+        List<Student> studentList = Arrays.asList(student);
+        double totalSum = 0.0;
+
+        for (Student student : studentList) {
+            totalSum += student.getJavaProgrammingGrade();
+        }
+        double average = totalSum / studentList.size();
+
+        when(studentServiceMock.getAllStudents()).thenReturn(studentList);
+
+        String result = schoolService.calculateAverageGrade();
+
+        assertEquals(String.format("Average grade is %.1f", average), result, "Expected and Actual message are not identical");
+
+        verify(studentServiceMock).getAllStudents();
+    }
+
+    @Test
+    void calculateAverageGrade3() {
+    }
+
+    @Test
+    void calculateAverageGrade4() {
     }
 
     @Test
