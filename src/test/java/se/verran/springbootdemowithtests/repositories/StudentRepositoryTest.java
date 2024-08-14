@@ -2,31 +2,45 @@ package se.verran.springbootdemowithtests.repositories;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 import se.verran.springbootdemowithtests.entities.Student;
+
+import java.time.LocalDate;
+import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@DataJpaTest
+@ActiveProfiles("test")
 class StudentRepositoryTest {
 
-    //TODO CHANGE ALL OF THIS - h2 database should be used - NO MOCKING
-    private StudentRepository studentRepositoryMock;
+    @Autowired
+    private StudentRepository studentRepository;
 
     @BeforeEach
     void setUp() {
-        studentRepositoryMock = mock(StudentRepository.class);
+        Student student = new Student();
+        student.setFirstName("Anders");
+        student.setLastName("Andersson");
+        student.setBirthDate(LocalDate.of(1989, 1, 22));
+        student.setEmail("Anders@Andersson.com");
+        studentRepository.save(student);
     }
 
     @Test
-    void existsStudentByEmail() {
-        String studentEmail = "freddans@testmail.com";
+    void existsStudentByEmailShouldReturnTrue() {
+        boolean isStudent = studentRepository.existsStudentByEmail("Anders@Andersson.com");
 
-        when(studentRepositoryMock.existsStudentByEmail(studentEmail)).thenReturn(true);
+        assertTrue(isStudent, "Email does not exist");
+    }
 
-        boolean isStudent = studentRepositoryMock.existsStudentByEmail(studentEmail);
+    @Test
+    void existsStudentByEmailShouldReturnFalse() {
+        boolean isStudent = studentRepository.existsStudentByEmail("Anders@FaultyMail.com");
 
-        assertTrue(isStudent, "Unexpected answer");
-
-        verify(studentRepositoryMock).existsStudentByEmail(studentEmail);
+        assertFalse(isStudent, "Email already exist");
     }
 }
