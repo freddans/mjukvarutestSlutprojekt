@@ -8,10 +8,8 @@ import org.springframework.test.context.ActiveProfiles;
 import se.verran.springbootdemowithtests.entities.Student;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @DataJpaTest
 @ActiveProfiles("test")

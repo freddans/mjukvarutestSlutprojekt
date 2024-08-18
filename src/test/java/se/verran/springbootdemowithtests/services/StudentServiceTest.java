@@ -4,13 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-import se.verran.springbootdemowithtests.controllers.SchoolController;
-import se.verran.springbootdemowithtests.controllers.StudentController;
 import se.verran.springbootdemowithtests.entities.Student;
 import se.verran.springbootdemowithtests.repositories.StudentRepository;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
